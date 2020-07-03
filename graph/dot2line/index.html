@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vector point to line</title>
+    <title>Vector Point to Line</title>
 </head>
 <body>
   <canvas width="500" height="500"></canvas>
@@ -11,6 +11,39 @@
 <script type="module">
     import { Vec2d } from '/libs/vec2d.js'
     console.log(new Vec2d(1, 0))
+    
+    let PtoQR = (x, y, x1, y1, x2, y2) => {
+        const P = new Vec2d(x, y),
+            Q = new Vec2d(x1, v1),
+            R = new Vec2d(x2, v2),
+            PQx = P.x - Q.x,
+            PQy = P.y - Q.y,
+            QRx = R.x - Q.x,
+            QRy = R.y - Q.y,
+            PRx = P.x - R.x,
+            PRy = P.y - R.y,
+            crossParam = (PQx * PRx + PQy * PRy) / (PRx**2 + PRy**2),
+            res = null
+        switch(crossParam){
+            // PQ
+            case crossParam <= 0 :
+            res = Math.hypot(PQx, PQy)
+            break
+            // PR
+            case crossParam >= 1 :
+            res = Math.hypot(QRx, QRy)
+            break
+            default:
+            const cx = Q.x + crossParam * QRx,
+                cy = Q.y + crossParam * QRy,
+                Pcx = P.x - cx,
+                Pcy = P.y - cy
+            res = Math.hypot(Pcx, Pcy)
+        }
+        return res
+    }
+
+
 </script>
 </body>
 </html>
