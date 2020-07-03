@@ -1,0 +1,15 @@
+{
+  "name": "VisualCanvasDev",
+  "version": "1.0.0",
+  "description": "canvas, math, gl, visual data development.",
+  "main": "index.js",
+  "repository": "https://github.com/HiZhaoxiaoyang/canv.git",
+  "author": "zhaoxiaoyang",
+  "license": "MIT",
+  "scripts": {
+    "start": "http-server -c-1 -p8888"
+  },
+  "dependencies": {
+    "http-server": "^0.12.3"
+  }
+}

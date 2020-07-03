@@ -1,12 +1,12 @@
 const { hypot, aten2, sin, cos, PI } = Math
 
-class Vec2d extends Array {
-    // constructor(x=1, y=0) {
-    //     super(x, y)
+export class Vec2d extends Array {
+    // constructor(x, y){
+    //     this.x = x
+    //     this.y = y
     // }
-    constructor(x, y){
-        this.x = x
-        this.y = y
+    constructor(x=1, y=0) {
+        super(x, y)
     }
 
     add(vx, vy){
@@ -61,5 +61,3 @@ class Vec2d extends Array {
         return this
     }
 }
-
-export default Vec2d
