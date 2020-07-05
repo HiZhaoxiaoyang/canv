@@ -1,12 +1,10 @@
-const { hypot, aten2, sin, cos, PI } = Math
+const { hypot, atan2, sin, cos, PI } = Math
 
 export class Vec2d extends Array {
-    // constructor(x, y){
-    //     this.x = x
-    //     this.y = y
-    // }
-    constructor(x=1, y=0) {
+    constructor(x=0, y=0) {
         super(x, y)
+        this.x = x
+        this.y = y
     }
 
     add(vx, vy){
@@ -14,12 +12,12 @@ export class Vec2d extends Array {
         this.y += vy
     }
 
-    get length() {
+    vlength() {
         return hypot(this.x, this.y)
     }
 
     rad() {
-        return aten2(this.y, this.x)
+        return Math.atan2(this.y, this.x)
     }
 
     degreeToRad(degree) {
@@ -27,7 +25,7 @@ export class Vec2d extends Array {
     }
 
     radToDegree(rd) {
-        rd * 180 / PI
+        return rd * 180 / PI
     }
 
     sinFromDegree(degree) {
@@ -44,6 +42,15 @@ export class Vec2d extends Array {
 
     vecToDegree() {
         return this.radToDegree(rad())
+    }
+
+    theaToDir() {
+        const r = this.vlength(),
+              thea = this.rad()
+        return [
+            r * cos(thea),
+            r * sin(thea)
+        ]
     }
 
     dot(v) {

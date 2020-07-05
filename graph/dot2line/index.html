@@ -10,7 +10,8 @@
 
 <script type="module">
     import { Vec2d } from '/libs/vec2d.js'
-    console.log(new Vec2d(1, 0))
+    const v = new Vec2d(3, 4)
+    console.log(v, v.length, v.vlength(), v.rad())
     
     let PtoQR = (x, y, x1, y1, x2, y2) => {
         const P = new Vec2d(x, y),
