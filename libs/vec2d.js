@@ -35,27 +35,58 @@ export class Vec2d extends Array {
     }
 
     vecToDegree() {
-        return this.radToDegree(rad())
+        return this.radToDegree(this.rad())
     }
 
-    theaToDir() {
-        const r = this.vlength(),
-              thea = this.rad()
-        return [
-            r * cos(thea),
-            r * sin(thea)
-        ]
+    cartesianToPolar(v) {
+        const radius = hypot(v.x, v.y),
+            theta = this.radToDegree(atan2(v.y, v.x))
+        return { r: radius, t: theta }
+    }
+
+    polarToCartesian(p) {
+        return {
+            x: p.r * cos(p.t),
+            y: p.r * sin(p.t)
+        }
     }
     /** end of angle,radians,sin/cos/tan.. */
 
     
-    add(vx, vy) {
-        this.x += vx
-        this.y += vy
+    add(v) {
+        this.x += v.x
+        this.y += v.y
     }
 
-    addNew(vx, vy) {
-        return this.constructor(this.x + vx, this.y + vy )
+    addNew(v) {
+        return new this.constructor(this.x + v.x, this.y + v.y )
+    }
+
+    sub(v) {
+        this.x -= v.x
+        this.y -= v.y
+    }
+
+    subNew(v) {
+        return new this.constructor( this.x - v.x, this.y - v.y )
+    }
+
+    negate() {
+        this.x = -this.x
+        this.y = -this.y
+    }
+
+    negateNew(v) {
+        return new this.constructor(-this.x, -this.y)
+    }
+
+    scale(s) {
+        this.x *= s
+        this.y *= s
+    }
+
+    scaleNew(v) {
+        return new this.constructor( this.x * s, this.y * s )
     }
 
     reset() {
@@ -63,11 +94,31 @@ export class Vec2d extends Array {
     }
 
     clone() {
+        // return new this.constructor(this.x, this.y)
         return new Vec2d(this.x, this.y)
+    }
+
+    equals(v) {
+        return this.x === v.x && this.y === v.y
     }
 
     vlength() {
         return hypot(this.x, this.y)
+    }
+
+    setLength(len) {
+        const r = this.vlength()
+        r && this.scale(len / r) || (this.x = len)
+    }
+
+    getAngle() {
+        return this.vecToDegree()
+    }
+
+    setAngle(angle) {
+        const r = this.vlength()
+        this.x = r * cos(this.degreeToRad(angle))
+        this.y = r * sin(this.degreeToRad(angle))
     }
 
     dot(v) {
@@ -78,15 +129,24 @@ export class Vec2d extends Array {
         return this.x * v.y + this.y * v.x
     }
 
-    rotate(rd) {
-        const s = sin(rd), c = cos(rd)
+    rotate(angle) {
+        const radians = this.degreeToRad(angle), 
+            c = cos(radians), s = sin(radians)
         this.x = this.x * c + this.y * -s
         this.y = this.x * s + this.y * c
-        return this
+        // return this
     }
 
-    angleV1V2(v) {
+    getNormal() {
+        return new this.constructor(-this.y, this.x)
+    }
+
+    isPerpTo(v) {
+        return this.dot(v) === 0
+    }
+
+    angleBetween(v) {
         const form = this.dot(v) / (this.vlength() * v.vlength())
-        return acos(form) * 180 / PI
+        return this.radToDegree(acos(form))
     }
 }
