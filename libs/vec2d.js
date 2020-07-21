@@ -1,49 +1,73 @@
 const { hypot, atan2, sin, cos, acos, PI } = Math
 
 export class Vec2d extends Array {
-    constructor(x=0, y=0) {
+    constructor(x=1, y=0) {
         super(x, y)
-        this.x = x
-        this.y = y
+        // this.x = x
+        // this.y = y
+    }
+
+    /**
+     * @param {number} x
+     */
+    set x(x) {
+        this[0] = x
+    }
+
+    get x() {
+        return this[0]
+    }
+
+    /**
+     * @param {number} y
+     */
+    set y(y) {
+        this[1] = y
+    }
+
+    get y() {
+        return this[1]
     }
 
     /**
      * Begin of angle,radians,sin/cos/tan..
      */
+    // 求弧度
     rad() {
         return Math.atan2(this.y, this.x)
     }
-
-    degreeToRad(degree) {
-        return degree * PI / 180
+    // 角度转弧度
+    angleToRad(angle) {
+        return angle * PI / 180
     }
-
-    radToDegree(rd) {
+    // 弧度转角度
+    radToAngle(rd) {
         return rd * 180 / PI
     }
-
-    sinFromDegree(degree) {
-        return sin(this.degreeToRad(degree))
+    // 角度转正弦
+    angleToSin(angle) {
+        return sin(this.angleToRad(angle))
     }
 
-    cosFromDegree(degree) {
-        return cos(this.degreeToRad(degree))
+    angleToCos(angle) {
+        return cos(this.angleToRad(angle))
     }
 
-    tanFromDegree(degree) {
-        return tan(this.degreeToRad(degree))
+    angleToTan(angle) {
+        return tan(this.angleToRad(angle))
     }
 
-    vecToDegree() {
-        return this.radToDegree(this.rad())
+    vecToAngle() {
+        return this.radToAngle(this.rad())
     }
 
+    // 笛卡尔坐标转极坐标
     cartesianToPolar(v) {
         const radius = hypot(v.x, v.y),
-            theta = this.radToDegree(atan2(v.y, v.x))
+            theta = this.radToAngle(atan2(v.y, v.x))
         return { r: radius, t: theta }
     }
-
+    // 极坐标转笛卡尔坐标
     polarToCartesian(p) {
         return {
             x: p.r * cos(p.t),
@@ -56,6 +80,7 @@ export class Vec2d extends Array {
     add(v) {
         this.x += v.x
         this.y += v.y
+        return this
     }
 
     addNew(v) {
@@ -83,6 +108,7 @@ export class Vec2d extends Array {
     scale(s) {
         this.x *= s
         this.y *= s
+        return this
     }
 
     scaleNew(v) {
@@ -112,13 +138,13 @@ export class Vec2d extends Array {
     }
 
     getAngle() {
-        return this.vecToDegree()
+        return this.vecToAngle()
     }
 
     setAngle(angle) {
         const r = this.vlength()
-        this.x = r * cos(this.degreeToRad(angle))
-        this.y = r * sin(this.degreeToRad(angle))
+        this.x = r * cos(this.angleToRad(angle))
+        this.y = r * sin(this.angleToRad(angle))
     }
 
     dot(v) {
@@ -130,11 +156,16 @@ export class Vec2d extends Array {
     }
 
     rotate(angle) {
-        const radians = this.degreeToRad(angle), 
-            c = cos(radians), s = sin(radians)
-        this.x = this.x * c + this.y * -s
-        this.y = this.x * s + this.y * c
-        // return this
+        const radians = this.angleToRad(angle)
+        return this.rotateRad(radians)
+    }
+
+    rotateRad(radians) {
+        const c = cos(radians), s = sin(radians),
+              [x, y] = this
+        this.x = x * c - y * s
+        this.y = x * s + y * c
+        return this
     }
 
     getNormal() {
@@ -147,6 +178,6 @@ export class Vec2d extends Array {
 
     angleBetween(v) {
         const form = this.dot(v) / (this.vlength() * v.vlength())
-        return this.radToDegree(acos(form))
+        return this.radToAngle(acos(form))
     }
 }
