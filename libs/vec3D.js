@@ -1,10 +1,8 @@
-const { hypot, atan2, sin, cos, acos, PI } = Math
+const { hypot, tan, atan2, sin, cos, acos, PI } = Math
 
-export class Vec2D extends Array {
-    constructor(x=1, y=0) {
-        super(x, y)
-        // this.x = x
-        // this.y = y
+export class Vec3D extends Array {
+    constructor(x=1, y=0, z=0) {
+        super(x, y, z)
     }
 
     /**
@@ -27,6 +25,17 @@ export class Vec2D extends Array {
 
     get y() {
         return this[1]
+    }
+
+    /**
+     * @param {number} z
+     */
+    set z(z) {
+        this[2] = z
+    }
+
+    get z() {
+        return this[2]
     }
 
     /**
@@ -60,78 +69,68 @@ export class Vec2D extends Array {
     vecToAngle() {
         return this.radToAngle(this.rad())
     }
-
-    // 笛卡尔坐标转极坐标
-    cartesianToPolar(v) {
-        const radius = hypot(v.x, v.y),
-            theta = this.radToAngle(atan2(v.y, v.x))
-        return { r: radius, t: theta }
-    }
-    // 极坐标转笛卡尔坐标
-    polarToCartesian(p) {
-        return {
-            x: p.r * cos(p.t),
-            y: p.r * sin(p.t)
-        }
-    }
     /** end of angle,radians,sin/cos/tan.. */
 
     
     add(v) {
         this.x += v.x
         this.y += v.y
+        this.z += v.z
         return this
     }
 
     addNew(v) {
-        return new this.constructor(this.x + v.x, this.y + v.y )
+        return new this.constructor(this.x + v.x, this.y + v.y, this.z + v.z )
     }
 
     sub(v) {
         this.x -= v.x
         this.y -= v.y
+        this.z -= v.z
         return this
     }
 
     subNew(v) {
-        return new this.constructor( this.x - v.x, this.y - v.y )
+        return new this.constructor( this.x - v.x, this.y - v.y, this.z - v.z )
     }
 
     negate() {
         this.x = -this.x
         this.y = -this.y
+        this.z = -this.z
         return this
     }
 
     negateNew(v) {
-        return new this.constructor(-this.x, -this.y)
+        return new this.constructor(-this.x, -this.y, -this.z)
     }
 
     scale(s) {
         this.x *= s
         this.y *= s
+        this.z *= s
         return this
     }
 
     scaleNew(v) {
-        return new this.constructor( this.x * s, this.y * s )
+        return new this.constructor( this.x * s, this.y * s, this.z * s )
     }
 
     reset() {
-        return this.constructor(this.x, this.y)
+        return this.constructor(this.x, this.y, this.z)
     }
 
     clone() {
         // return new this.constructor(this.x, this.y)
-        return new Vec2D(this.x, this.y)
+        return new Vec3D(this.x, this.y, this.z)
     }
 
     equals(v) {
-        return this.x === v.x && this.y === v.y
+        return this.x === v.x && this.y === v.y && this.z === v.z
     }
 
     vlength() {
-        return hypot(this.x, this.y)
+        return hypot(this.x, this.y ,this.z)
     }
 
     setLength(len) {
@@ -147,22 +146,23 @@ export class Vec2D extends Array {
         const r = this.vlength()
         this.x = r * cos(this.angleToRad(angle))
         this.y = r * sin(this.angleToRad(angle))
+        this.z = r * tan(this.angleToRad(angle))
     }
 
     dot(v) {
-        return this.x * v.x + this.y * v.y
+        return this.x * v.x + this.y * v.y + this.z * v.z
     }
-
+    // tbd
     cross(v) {
         return this.x * v.y + this.y * v.x
     }
 
-    rotate(angle) {
+    rotateZ(angle) {
         const radians = this.angleToRad(angle)
-        return this.rotateRad(radians)
+        return this.rotateZrad(radians)
     }
 
-    rotateRad(radians) {
+    rotateZrad(radians) {
         const c = cos(radians), s = sin(radians),
               [x, y] = this
         this.x = x * c - y * s
@@ -171,11 +171,7 @@ export class Vec2D extends Array {
     }
 
     getNormal() {
-        return new this.constructor(-this.y, this.x)
-    }
-
-    isPerpTo(v) {
-        return this.dot(v) === 0
+        return new this.constructor(-this.y, this.x, this.z)
     }
 
     angleBetween(v) {

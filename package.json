@@ -1,5 +1,5 @@
 {
-  "name": "VisualCanvasDev",
+  "name": "visual_canvas_dev",
   "version": "1.0.0",
   "description": "canvas, math, gl, visual data development.",
   "main": "index.js",
