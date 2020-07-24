@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Point in/out scan area.</title>
+    <style> body{ display: flex; align-items: center; justify-content: center; background:#daf6ff;}
+    canvas{ border:1px solid #069; background:#fff;}</style>
+</head>
+<body>
+
+<canvas id="c" width="600" height="600"></canvas>
+
+<script type="module">
+import { Vec2D } from "/libs/Vec2D.js";
+
+const vec = new Vec2D(0, 0),
+      context = c.getContext('2d'),
+      angle = -66,
+      dir = new Vec2D(0, 1).rotate(angle)
+
+const objRight = vec.polarToCartesian({r:400, t: vec.angleToRad(60)}),
+      objLeft = vec.polarToCartesian({r:400, t: vec.angleToRad(120)}),
+      transXY = [c.width/2, c.height/2],
+      cos1of6 = Math.cos(Math.PI/6)
+
+console.log(cos1of6, vec.angleToCos(angle))
+
+context.translate(...transXY)
+context.scale(1, -1)
+context.lineCap='round'
+context.lineWidth=1
+
+const setRight = new Vec2D(...Object.values(objRight)).rotate(angle),
+      setLeft = new Vec2D(...Object.values(objLeft)).rotate(angle)
+
+// scan right
+context.beginPath()
+context.moveTo(0, 0)
+context.lineTo(...setRight)
+context.stroke();
+context.save();
+
+// scan left
+context.beginPath()
+context.moveTo(0, 0)
+context.lineTo(...setLeft)
+context.stroke();
+context.save();
+
+// click log
+context.beginPath();
+context.font='30px sans-serif';
+// context.translate(...transXY)
+context.scale(1, -1)
+context.moveTo(300, 400);
+// context.fillText('', 0, 100);
+context.save();
+
+
+
+// events
+c.addEventListener('click', e => {
+    const mXY = [e.offsetX - transXY[0],  transXY[1] - e.offsetY],
+         v0 = new Vec2D(...mXY),
+        //  isInRange = v0.rad() > Math.PI / 3 && v0.rad() < 2 * Math.PI / 3;
+        //  isInRange = new Vec2D(0, 1).cross(v0.normalize()) <= 0.5;
+         isInRange = dir.dot(v0.normalize()) >= cos1of6;
+    console.log(v0, isInRange)
+    context.clearRect(-100, 40, 300, 100);
+    context.fillText(`${isInRange} : [${mXY}]`, -100, 100);
+})
+
+
+
+</script>
+
+</body>
+</html>

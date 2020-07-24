@@ -73,6 +73,9 @@ export class Vec2D extends Array {
             x: p.r * cos(p.t),
             y: p.r * sin(p.t)
         }
+        // this.x = p.r * cos(p.t)
+        // this.y = p.r * sin(p.t)
+        // return this
     }
     /** end of angle,radians,sin/cos/tan.. */
 
@@ -147,6 +150,10 @@ export class Vec2D extends Array {
         const r = this.vlength()
         this.x = r * cos(this.angleToRad(angle))
         this.y = r * sin(this.angleToRad(angle))
+    }
+
+    normalize() {
+        return this.scale(1 / this.vlength())
     }
 
     dot(v) {

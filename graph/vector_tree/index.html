@@ -10,7 +10,7 @@
   <canvas id="c" width="500" height="500"></canvas>
 
 <script type="module">
-import { Vec2d } from '/libs/Vec2D.js'
+import { Vec2D } from '/libs/Vec2D.js'
 
 const ctx = c.getContext('2d')
 const { PI, random, sin, cos } = Math
@@ -20,7 +20,7 @@ ctx.scale(1, -1)
 ctx.lineCap='round'
 
 function drawBranch(context, v0, length, thickness, dir, bias) {
-    const v = new Vec2d().rotateRad(dir).scale(length),
+    const v = new Vec2D().rotateRad(dir).scale(length),
           v1 = v0.clone().add(v)
     ctx.lineWidth= thickness
     ctx.beginPath()
@@ -49,7 +49,7 @@ function drawBranch(context, v0, length, thickness, dir, bias) {
     }
 }
 
-const v0 = new Vec2d(250, 0)
+const v0 = new Vec2D(250, 0)
 drawBranch(ctx, v0, 50, 10, 1, 3)
 
 </script>
