@@ -3,8 +3,6 @@ const { hypot, atan2, sin, cos, acos, PI } = Math
 export class Vec2D extends Array {
     constructor(x=1, y=0) {
         super(x, y)
-        // this.x = x
-        // this.y = y
     }
 
     /**
