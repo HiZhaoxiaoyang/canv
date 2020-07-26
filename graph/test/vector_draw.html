@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vector shape</title>
+</head>
+<body>
+
+<canvas id="c" width="600" height="600"></canvas>
+
+<script type="module">
+import { Vec2D } from "/libs/Vec2D.js";
+
+const context = c.getContext('2d');
+const { width, height} = c
+context.translate(.5 * width, .5 * height);
+context.scale(1, -1);
+
+function regularShape(edges = 3, x, y, border) {
+    const ret = [],
+        // delta = Math.PI * ( 1 - (edges - 2) / edges)
+        delta = 2 * Math.PI / edges
+    let p = new Vec2D(x, y)
+    const dir = new Vec2D(border, 0)
+    ret.push(p)
+    for (let i = 0; i < edges; i++) {
+        p = p.clone().add(dir.rotateRad(delta))
+        ret.push(p)
+    }
+    return ret
+}
+
+function draw(points, strokeStyle='black', fillStyle=null) {
+    context.strokeStyle = strokeStyle
+    context.beginPath();
+    context.moveTo(...points[0])
+    for (let i = 1; i < points.length; i++) {
+        context.lineTo(...points[i]);
+    }
+    context.closePath();
+    if (fillStyle) {
+        context.fillStyle = fillStyle
+        context.fill();
+    }
+    context.stroke();
+}
+
+draw(regularShape(3, 128, 128, 100), 'red', 'blue')
+
+draw(regularShape(6, -64, 128, 50), 'green', 'yellow');
+
+draw(regularShape(11, -64, -64, 30), 'blue', 'red');
+draw(regularShape(60, 128, -64, 6), 'black', 'green');
+
+</script>
+</body>
+</html>
