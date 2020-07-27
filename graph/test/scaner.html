@@ -31,6 +31,24 @@ context.scale(1, -1)
 context.lineCap='round'
 context.lineWidth=1
 
+function drawAxis() {
+    context.save()
+    context.strokeStyle = '#ccc'
+    context.beginPath()
+    context.moveTo(-c.width, 0)
+    context.lineTo(c.width, 0)
+    context.stroke()
+    context.beginPath()
+    context.moveTo(0, -c.height)
+    context.lineTo(0, c.height)
+    context.stroke()
+    context.restore()
+}
+drawAxis()
+
+/**
+ * Scaner
+ */
 const setRight = new Vec2D(...Object.values(objRight)).rotate(angle),
       setLeft = new Vec2D(...Object.values(objLeft)).rotate(angle)
 
