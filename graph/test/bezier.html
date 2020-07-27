@@ -80,8 +80,9 @@ const Bezier = isq => {
             p3,
         ]).draw(ctx);
     }
+    const func = isq ? q : c
     for (let i = 0; i < count; i++) {
-        isq ? q() : c()
+        func()
     }
 }
 
