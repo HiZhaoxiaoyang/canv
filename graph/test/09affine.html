@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>affine.transformation</title>
+</head>
+<body>
+
+<canvas id="c" width="600" height="600"></canvas>
+
+<script type="module">
+/**
+ * 是指在几何中，一个向量空间进行一次线性变换并接上一个平移，变换为另一个向量空间。
+ * 1.仿射变换前是直线段的，仿射变换后依然是直线段；
+ * 2.对两条直线段 a 和 b 应用同样的仿射变换，变换前后线段长度比例保持不变；
+ * 
+ * 旋转和缩放都可以写成矩阵与向量相乘的形式。
+ * 这种能写成矩阵与向量相乘形式的变换，就叫做线性变换。
+ * 1.线性变换不改变坐标原点（因为如果 x0、y0等于零，那么 x、y 肯定等于 0）；
+ * 2.线性变换可以叠加，多个线性变换的叠加结果就是将线性变换的矩阵依次相乘，再与原始向量相乘。
+ * 
+ * 将原本 n 维的坐标转换为了 n+1 维的坐标。这种 n+1 维坐标被称为齐次坐标，对应的矩阵就被称为齐次矩阵。
+ * */
+
+// import { earcut } from "/libs/earcut.js"
+
+const gl = c.getContext('webgl')
+
+let awaitData = function (url) {
+    return new Promise((resolve, reject) => {
+        fetch(url).then((res) => {
+            return res.text()
+        }).then((res) => resolve(res))
+    })
+}
+
+Promise.all([
+    awaitData('./09vertex.glsl'),
+    awaitData('./09fragment.glsl')
+]).then((values) => {
+    const { 0: vertex, 1: fragment } = values
+    interactor(vertex, fragment)
+});
+
+let interactor = (vertex, fragment) => {
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
+    gl.shaderSource(vertexShader, vertex);
+    gl.compileShader(vertexShader);
+    
+    const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+    gl.shaderSource(fragmentShader, fragment);
+    gl.compileShader(fragmentShader);
+    
+    const program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
+    gl.useProgram(program);
+    
+    const position = new Float32Array([
+      -1, -1,
+      0, 1,
+      1, -1,
+    ]);
+    const bufferId = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferId);
+    gl.bufferData(gl.ARRAY_BUFFER, position, gl.STATIC_DRAW);
+    
+    const vPosition = gl.getAttribLocation(program, 'position');
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPosition);
+    
+    function randomTriangles() {
+      const u_color = [Math.random(), Math.random(), Math.random(), 1.0]; // 随机颜色
+      const u_rotation = Math.random() * Math.PI; // 初始旋转角度
+      const u_scale = Math.random() * 0.05 + 0.03; // 初始大小
+      const u_time = 0;
+      const u_duration = 3.0; // 持续3秒钟
+    
+      const rad = Math.random() * Math.PI * 2;
+      const u_dir = [Math.cos(rad), Math.sin(rad)]; // 运动方向
+      const startTime = performance.now();
+    
+      return {u_color, u_rotation, u_scale, u_time, u_duration, u_dir, startTime};
+    }
+    
+    function setUniforms(gl, {u_color, u_rotation, u_scale, u_time, u_duration, u_dir}) {
+      let loc = gl.getUniformLocation(program, 'u_color');
+      gl.uniform4fv(loc, u_color);
+    
+      loc = gl.getUniformLocation(program, 'u_rotation');
+      gl.uniform1f(loc, u_rotation);
+    
+      loc = gl.getUniformLocation(program, 'u_scale');
+      gl.uniform1f(loc, u_scale);
+    
+      loc = gl.getUniformLocation(program, 'u_time');
+      gl.uniform1f(loc, u_time);
+    
+      loc = gl.getUniformLocation(program, 'u_duration');
+      gl.uniform1f(loc, u_duration);
+    
+      loc = gl.getUniformLocation(program, 'u_dir');
+      gl.uniform2fv(loc, u_dir);
+    }
+    
+    let triangles = [];
+    function update(t) {
+      for(let i = 0; i < 5 * Math.random(); i++) {
+        triangles.push(randomTriangles());
+      }
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      triangles.forEach((triangle) => {
+        triangle.u_time = (performance.now() - triangle.startTime) / 1000;
+        setUniforms(gl, triangle);
+        gl.drawArrays(gl.TRIANGLES, 0, position.length / 2);
+      });
+    
+      triangles = triangles.filter((triangle) => {
+        return triangle.u_time <= triangle.u_duration;
+      });
+      requestAnimationFrame(update);
+    }
+    
+    requestAnimationFrame(update);
+}
+
+</script>
+</body>
+</html>
