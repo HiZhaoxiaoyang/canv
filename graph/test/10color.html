@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>system color</title>
+    <style>body{ margin:0; padding: 0; } .title{ color: #fff; position: absolute; margin:10px; font-size: 30px;margin: 30px;}</style>
+</head>
+<body>
+
+<aside class="title"></aside>
+<canvas id="c" width="600" height="600"></canvas>
+
+<script type="text/javascript">
+
+const ctx = c.getContext('2d'),
+    { random, sin, cos, min, PI } = Math,
+	W = window.innerWidth,
+	H = window.innerHeight,
+	S = min(W, H),
+	NUM_CIRCLES = 1e3,
+	ATTRACTION = 0.25,
+	SPREAD = 1.5,
+	RANGE = 0.9,
+	MAX_CIRCLE_SIZE = 3,
+    CIRCLES = [],
+    ColorType = Date.now()%3
+    
+
+let setColor = (i = 1) => {
+    const colors = [
+        i => `rgb(${random()*255}, ${random()*255}, ${random()*255})`,
+        i => `hsl(${random()*360}, ${random()*80}%, ${20+random()*40}%)`,
+        i => `rgba(${sin(i) * 127 + 128}, ${sin(i + 2) * 127 + 128},${sin(i + 3) * 127 + 128},${sin(i)})`
+    ]
+    return colors[ColorType](i)
+}
+
+class Circle {
+	constructor(i = 0) {
+		this.pos = new Vector(W / 2, H / 2)
+		this.vel = new Vector(random() * SPREAD + RANGE, random() * SPREAD + RANGE)
+		this.rot = random() * PI * 2
+        this.color = setColor(i)
+        console.log(this.color)
+		this.r = random() * (MAX_CIRCLE_SIZE - 1) + 1
+	}
+
+	update() {
+		const ROT_VEL = random() * ATTRACTION
+		const XCoord = this.pos.x - W / 2
+		const YCoord = this.pos.y - H / 2
+
+		let dx = this.vel.x * cos(this.rot)
+		let dy = this.vel.y * sin(this.rot)
+		dx -= XCoord / (S / 2)
+		dy -= YCoord / (S / 2)
+		this.pos.add(dx, dy)
+
+		this.rot += (random() - random()) * ROT_VEL
+	}
+
+	draw() {
+		ctx.beginPath()
+		ctx.fillStyle = this.color
+		ctx.arc(this.pos.x, this.pos.y, this.r, 0, PI * 2)
+		ctx.fill()
+		ctx.closePath()
+	}
+}
+
+class Vector {
+	constructor(x, y) {
+		this.x = x
+		this.y = y
+	}
+
+	add(a, b) {
+		this.x += a
+		this.y += b
+	}
+}
+
+function renderCircles() {
+	for (let i = 0; i < CIRCLES.length; i++) {
+		CIRCLES[i].update()
+		CIRCLES[i].draw()
+	}
+}
+
+function loop() {
+	window.requestAnimationFrame(loop)
+	ctx.fillStyle = 'rgba(0,0,0,0.1)'
+	ctx.fillRect(0, 0, W, H)
+	renderCircles()
+}
+
+function createCircles() {
+	for (let i = 0; i < NUM_CIRCLES; i++) {
+		CIRCLES.push(new Circle(i))
+	}
+}
+
+function init() {
+	c.width = W
+	c.height = H
+	createCircles()
+    loop()
+    document.querySelector('.title').textContent = ['rgb', 'hsl', 'rgba'][ColorType]
+}
+init()
+
+</script>
+</body>
+</html>
