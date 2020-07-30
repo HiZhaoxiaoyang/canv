@@ -17,7 +17,8 @@ const ctx = c.getContext('2d'),
     { random, sin, cos, min, PI } = Math,
 	W = window.innerWidth,
 	H = window.innerHeight,
-	S = min(W, H),
+    S = min(W, H),
+    coefficient = random(),
 	NUM_CIRCLES = 1e3,
 	ATTRACTION = 0.25,
 	SPREAD = 1.5,
@@ -25,13 +26,16 @@ const ctx = c.getContext('2d'),
 	MAX_CIRCLE_SIZE = 3,
     CIRCLES = [],
     ColorType = Date.now()%3
-    
 
 let setColor = (i = 1) => {
     const colors = [
-        i => `rgb(${random()*255}, ${random()*255}, ${random()*255})`,
-        i => `hsl(${random()*360}, ${random()*80}%, ${20+random()*40}%)`,
-        i => `rgba(${sin(i) * 127 + 128}, ${sin(i + 2) * 127 + 128},${sin(i + 3) * 127 + 128},${sin(i)})`
+        i => `rgba(${random()*255}, ${random()*255}, ${random()*255}, ${random()})`,
+        // i => `hsl(${random()*360}, ${random()*80}%, ${20+random()*40}%)`,
+        i => `hsl(${random()*360}, 60%, 50%)`,
+        i => `rgba(${sin(i + 1 + coefficient) * 127 + 128}, 
+                    ${sin(i + coefficient*10) * 127 + 128},
+                    ${sin(i + coefficient*20) * 127 + 128}, 
+                    ${sin(i)})`
     ]
     return colors[ColorType](i)
 }
@@ -42,7 +46,7 @@ class Circle {
 		this.vel = new Vector(random() * SPREAD + RANGE, random() * SPREAD + RANGE)
 		this.rot = random() * PI * 2
         this.color = setColor(i)
-        console.log(this.color)
+        // console.log(this.color)
 		this.r = random() * (MAX_CIRCLE_SIZE - 1) + 1
 	}
 
@@ -106,7 +110,7 @@ function init() {
 	c.height = H
 	createCircles()
     loop()
-    document.querySelector('.title').textContent = ['rgb', 'hsl', 'rgba'][ColorType]
+    document.querySelector('.title').textContent = ['rgba', 'hsl', 'rgba(CIE Lab)'][ColorType]
 }
 init()
 
