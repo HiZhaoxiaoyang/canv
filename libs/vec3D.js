@@ -152,30 +152,133 @@ export class Vec3D extends Array {
     dot(v) {
         return this.x * v.x + this.y * v.y + this.z * v.z
     }
-    // tbd
+
     cross(v) {
-        return this.x * v.y + this.y * v.x
+        const { x, y, z } = this,
+              cx = y * v.z - z * v.y,
+              cy = z * v.x - x * v.z,
+              cz = x * v.y - y * v.x
+        return new this.constructor(cx, cy, cz)
+        // return this.x * v.y + this.y * v.x
+    }
+
+    angleBetween(v) {
+        const form = this.dot(v) / (this.vlength() * v.vlength())
+        return this.radToAngle(acos(form))
+    }
+
+    getPerspective(viewDist) {
+        if (viewDist === undefined) viewDist = 300
+        return viewDist / (this.z + viewDist)
+    }
+
+    persProject(p) {
+        p = p || this.getPerspective()
+        this.x *= p
+        this.y *= p
+        this.z = 0
+        return this
+    }
+
+    persProjectNew(p) {
+        p = p || this.getPerspective()
+        this.x *= p
+        this.y *= p
+        return new this.constructor(this.x, this.y, 0)
+    }
+
+    rotateX(angle) {
+        let c = this.angleToCos(angle),
+            s = this.angleToSin(angle)
+        // this.y = y * c - z * s
+        // this.z = y * s + z * c
+        return this.rotateXTrig(c ,s)
+    }
+
+    rotateXTrig(c, s) {
+        const {x, y, z} = this
+        this.y = y * c - z * s
+        this.z = y * s + z * c
+        return this
+    }
+
+    rotateY(angle) {
+        let c = this.angleToCos(angle),
+            s = this.angleToSin(angle)
+        return this.rotateYTrig(c ,s)
+    }
+
+    rotateYTrig(c, s) {
+        const {x, y, z} = this
+        this.x = x * c - z * s
+        this.z = x * -s + z * c
+        return this
     }
 
     rotateZ(angle) {
-        const radians = this.angleToRad(angle)
-        return this.rotateZrad(radians)
+        let c = this.angleToCos(angle),
+            s = this.angleToSin(angle)
+        return this.rotateZTrig(c ,s)
     }
 
+    rotateZTrig(c, s) {
+        const {x, y, z} = this
+        this.x = x * c - y * s
+        this.y = x * s + y * c
+        return this
+    }
+
+    rotateXY(a, b) {
+        let ca = this.angleToCos(a),
+            sa = this.angleToSin(a),
+            cb = this.angleToCos(b),
+            sb = this.angleToSin(b)
+        return this.rotateXYTrig(ca, sa, cb, sb)
+    }
+
+    rotateXYTrig(ca, sa, cb, sb) {
+        const {x, y, z} = this,
+              rz = y * sa + z * ca      // rotate x
+        this.y = y * ca - z * sa
+        this.z = x * - sb + rz * cb
+        this.x = x * cb + rz * sb
+        return this
+    }
+
+    rotateXYZ(a, b, c) {
+        const ca = this.angleToCos(a),
+            sa = this.angleToSin(a),
+            cb = this.angleToCos(b),
+            sb = this.angleToSin(b),
+            cc = this.angleToCos(c),
+            sc = this.angleToSin(c)
+        return this.rotateXYZTrig(ca, sa, cb, sb, cc, sc)
+    }
+
+    rotateXYZTrig(ca, sa, cb, sb, cc, sc) {
+        const {x, y, z} = this,
+            // rotate x
+            ry = y * ca - z * sa,
+            rz = y * sa + z * ca,
+            // rotate y
+            rx = x * cb - rz * sb
+        this.z = x * -sb + rz * cb
+        // rotate z
+        this.x = rx * cc - ry * sc
+        this.y = rx * sc + ry * cc
+        return this
+    }
+
+    /*
     rotateZrad(radians) {
         const c = cos(radians), s = sin(radians),
               [x, y] = this
         this.x = x * c - y * s
         this.y = x * s + y * c
         return this
-    }
+    }*/
 
     getNormal() {
         return new this.constructor(-this.y, this.x, this.z)
-    }
-
-    angleBetween(v) {
-        const form = this.dot(v) / (this.vlength() * v.vlength())
-        return this.radToAngle(acos(form))
     }
 }
