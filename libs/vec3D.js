@@ -1,3 +1,7 @@
+/*
+ * Vector 3D Class
+ * createby@zhaoxiaoyang
+ */
 const { hypot, tan, atan2, sin, cos, acos, PI } = Math
 
 export class Vec3D extends Array {
