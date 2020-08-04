@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>particle wall</title>
+    <style>body{background:#eee;} canvas{background: #fff;}</style>
 </head>
 <body>
 
@@ -11,22 +12,7 @@
 
 <script type="module">
 import { Vec2D } from "/libs/Vec2D.js";
-import { Particle3D } from './libs/Particle3D.js'
-
-function getWallPoints(width, height, xDivisions, yDivisions) {
-    let x, y, z, pts = [], depth = 0
-    for (let i = 0; i < xDivisions; i++) {
-        for (let j = 0; j < yDivisions; j++) {
-            x = width * (i / xDivisions - .5)
-            y = height * (j / yDivisions - .5)
-            z = 0
-            pts.push(new Particle3D(x, y, z, this, 'dot', depth++))
-        }
-    }
-    return pts
-}
-
-// let wall = getWallPoints(200, 200, 4, 6)
+import { Particle3D } from '/libs/Particle3D.js'
 
 const { PI, min, sin, cos, round } = Math
 
@@ -34,6 +20,51 @@ const context = c.getContext('2d')
 const { width, height} = c
 context.translate(.5 * width, .5 * height)
 context.scale(1, -1)
+
+function getWallPoints(width, height, xDivisions, yDivisions) {
+    // console.count('wall')
+    let x, y, z, pts = [], depth = 0
+    for (let i = 0; i < xDivisions; i++) {
+        for (let j = 0; j < yDivisions; j++) {
+            x = width * (i / xDivisions - .5)
+            y = height * (j / yDivisions - .5)
+            z = 0
+            pts.push(new Particle3D(x, y, z, context, 'dot', depth++))
+        }
+    }
+    return pts
+}
+// const wall = getWallPoints(200, 200, 4, 6)
+
+function arrayRotateXY(particleArr, angleX, angleY) {
+    let i = particleArr.length
+    while(i--) {
+        particleArr[i].position.rotateXY(angleX, angleY)
+        particleArr[i].render()
+    }
+}
+/*
+let angleX = 0, angleY = 0
+setInterval(() => {
+    context.clearRect(-300, -300, width, height)
+    angleX+=5
+    angleY+=5
+    console.log(angleX, angleY)
+    arrayRotateXY(getWallPoints(200, 200, 4, 6), angleX, angleY)
+}, 1000)
+arrayRotateXY(wall, angleX, angleY)
+*/
+c.addEventListener('mousemove', e => {
+    console.log(e.x, e.y, e.x-300, 300-e.y)
+    context.clearRect(-300, -300, width, height)
+    // arrayRotateXY(getWallPoints(200, 200, 4, 6), e.x / 6, e.y / 6)
+    arrayRotateXY(getWallPoints(300, 300, 10, 10), (300-e.y)/10, (300-e.x)/10)
+})
+c.addEventListener('click', e => {
+    context.clearRect(-300, -300, width, height)
+})
+
+
 
 function draw(points, strokeStyle='black', fillStyle=null) {
     context.strokeStyle = strokeStyle
@@ -49,22 +80,23 @@ function draw(points, strokeStyle='black', fillStyle=null) {
     }
     context.stroke()
 }
-
 const TAU_SEG = 60, TAU = PI * 2
+function rect(x0, y0, w, h) {}
 function arc(x0, y0, radius, startAng = 0, endAng = TAU) {
-    const ang = min(TAU, endAng - startAng),
-          ret = ang === TAU ? [] : [[x0, y0]],
-          segments = round(TAU_SEG * ang / TAU)
+    // const ang = min(TAU, endAng - startAng),
+    //       ret = ang === TAU ? [] : [[x0, y0]],
+    //       segments = round(TAU_SEG * ang / TAU)
+    const ret = [], segments = TAU_SEG
     for (let i = 0; i <= segments; i++) {
-        console.log(startAng, ang, i, 111111111, startAng + ang * i, ang * i/segments)
-        const x = x0 + radius * cos(startAng + ang * i / 6.66 ),
-              y = y0 + radius * sin(startAng + ang * i / 6.66 )
+        // console.log(startAng, ang, i, 111111111, startAng + ang * i, ang * i/segments)
+        const x = x0 + radius * cos(startAng + TAU * i / 6.66 ),
+              y = y0 + radius * sin(startAng + TAU * i / 6.66 )
         ret.push([x, y])
     }
     return ret
 }
-
-draw(arc(0, 0, 100), 'red', '#ffcc00')
+// draw(arc(0, 0, 100), 'red', '#ffcc00')
+// draw([[10,10], [20,20], [30, 30], [40, 40]], 'red', '#ffcc00')
 
 </script>
 </body>
