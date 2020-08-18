@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>grid</title>
+    <style>
+        body{
+            margin:0; padding: 0;
+            /* background-image: linear-gradient(to right, transparent 90%, #ccc 100%), linear-gradient(to bottom, transparent 90%, #ccc 100%);
+            background-size: 10px 10px, 10px 10px; */
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="c" width="512" height="512"></canvas>
+
+<script src="/libs/gl-renderer.js"></script>
+<script type="text/javascript">
+const vertex = `
+    attribute vec2 a_vertexPosition;
+    attribute vec2 uv;
+
+    varying vec2 vUv;
+
+    void main() {
+        gl_PointSize = 1.0;
+        vUv = uv;
+        gl_Position = vec4(a_vertexPosition, 1, 1);
+    }
+`
+const fragment = `
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+
+    varying vec2 vUv;
+    uniform float rows;
+
+    void main() {
+        vec2 st = fract(vUv * rows);
+        float d1 = step(st.x, 0.9);
+        float d2 = step(0.1, st.y);
+        gl_FragColor.rgb = mix(vec3(0.8), vec3(1.0), d1 * d2);
+        gl_FragColor.a = 1.0;
+    }
+`
+
+const renderer = new GlRenderer(c)
+
+const program = renderer.compileSync(fragment, vertex)
+renderer.useProgram(program)
+renderer.uniforms.rows = 1
+
+const rows = [1, 4, 16, 32, 64, 128]
+let idx = 0
+const timerId = setInterval(() => {
+    renderer.uniforms.rows = rows[idx++%5]
+}, 1000)
+
+renderer.setMeshData([{
+    positions: [
+        [-1, -1],
+        [-1, 1],
+        [1, 1],
+        [1, -1]
+    ],
+    attributes: {
+        uv: [
+            [0, 0],
+            [0, 1],
+            [1, 1],
+            [1, 0]
+        ]
+    },
+    cells: [
+        [0, 1, 2],
+        [2, 0, 3]
+    ]
+}])
+
+renderer.render()
+
+
+</script>
+</body>
+</html>
