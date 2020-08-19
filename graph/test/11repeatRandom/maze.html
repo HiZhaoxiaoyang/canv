@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandelbrot</title>
+    <title>maze</title>
     <style>
         body{
             margin:0; padding: 0;
@@ -27,8 +27,8 @@ let awaitData = function (url) {
 }
 
 Promise.all([
-    awaitData('./mandelVertex.glsl'),
-    awaitData('./mandelFragment.glsl')
+    awaitData('./maze.vert.glsl'),
+    awaitData('./maze.frag.glsl')
 ]).then((values) => {
     const { 0: vertex, 1: fragment } = values
     interactor(vertex, fragment)
@@ -40,10 +40,7 @@ let interactor = (vertex, fragment) => {
 
     const program = renderer.compileSync(fragment, vertex)
     renderer.useProgram(program)
-
-    renderer.uniforms.center = [0.367, 0.303]
-    renderer.uniforms.scale = 1
-    renderer.uniforms.iterations = 256
+    renderer.uniforms.rows = 20
 
     renderer.setMeshData([{
         positions: [
@@ -64,15 +61,6 @@ let interactor = (vertex, fragment) => {
     }]);
 
     renderer.render()
-
-    function update() {
-        const factor = Math.max(0.1, Math.log(renderer.uniforms.scale));
-        renderer.uniforms.scale = (renderer.uniforms.scale += factor) % 10000;
-        renderer.uniforms.iterations = factor * 500;
-        requestAnimationFrame(update);
-    }
-
-    setTimeout(update, 2000)
 }
 
 </script>

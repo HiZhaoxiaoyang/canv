@@ -3,22 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandelbrot</title>
+    <title>r2</title>
     <style>
-        body{
-            margin:0; padding: 0;
-        }
+        body{ margin:0; padding: 0; }
     </style>
 </head>
 <body>
 
-<canvas id="c" width="512" height="512"></canvas>
+<canvas id="c"></canvas>
 
 <script src="/libs/gl-renderer.js"></script>
 
 <script type="text/javascript">
 
-let awaitData = function (url) {
+let renderer,
+    awaitData = function (url) {
     return new Promise((resolve, reject) => {
         fetch(url).then((res) => {
             return res.text()
@@ -27,23 +26,26 @@ let awaitData = function (url) {
 }
 
 Promise.all([
-    awaitData('./mandelVertex.glsl'),
-    awaitData('./mandelFragment.glsl')
+    awaitData('./rand2.vert.glsl'),
+    awaitData('./rand2.frag.glsl')
 ]).then((values) => {
     const { 0: vertex, 1: fragment } = values
     interactor(vertex, fragment)
 })
 
-const renderer = new GlRenderer(c)
+const init = i => {
+    c.width = window.innerWidth
+    c.height = window.innerHeight
+    renderer = new GlRenderer(c)
+}
+init()
+window.onresize = init
 
 let interactor = (vertex, fragment) => {
 
     const program = renderer.compileSync(fragment, vertex)
     renderer.useProgram(program)
-
-    renderer.uniforms.center = [0.367, 0.303]
-    renderer.uniforms.scale = 1
-    renderer.uniforms.iterations = 256
+    renderer.uniforms.uTime = 0.0
 
     renderer.setMeshData([{
         positions: [
@@ -65,16 +67,11 @@ let interactor = (vertex, fragment) => {
 
     renderer.render()
 
-    function update() {
-        const factor = Math.max(0.1, Math.log(renderer.uniforms.scale));
-        renderer.uniforms.scale = (renderer.uniforms.scale += factor) % 10000;
-        renderer.uniforms.iterations = factor * 500;
-        requestAnimationFrame(update);
-    }
-
-    setTimeout(update, 2000)
+    requestAnimationFrame(update=t=>{
+        renderer.uniforms.uTime = 4 * t / 1000
+        requestAnimationFrame(update)
+    })
 }
-
 </script>
 </body>
 </html>
